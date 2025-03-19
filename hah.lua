@@ -4,7 +4,7 @@ getgenv().ScriptVersion = "ThemeCreator"
 getgenv().PlaceName = "Projects"
 getgenv().PlaceFileName = `Projects-{getgenv().ScriptVersion}`
 
-loadstring(game:HttpGet("........"))()
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zaaaa43/nothings/refs/heads/main/tampilan.lua"))()
 
 type Tab = {
 	CreateSection: (self: Tab, Name: string) -> Section,
