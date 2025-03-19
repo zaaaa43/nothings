@@ -1,18 +1,64 @@
-game:GetService("Players").LocalPlayer.Idled:connect(function()
-    game:GetService("VirtualUser"):CaptureController()
-    game:GetService("VirtualUser"):ClickButton2(Vector2.new())
-    warn("Anti afk berlari-lari")
-end)
+local getgenv: () -> ({[string]: any}) = getfenv().getgenv
 
+getgenv().ScriptVersion = "v1"
 -- Load UI Library
-local library = loadstring(game:HttpGet("https://raw.githubusercontent.com/uupwww/Gdje-ka-ada-/refs/heads/main/63834sadwi121jisd", true))()
-local window = library:CreateWindow({ text = "Fishing4Trouble" })
+loadstring(game:HttpGet("https://raw.githubusercontent.com/zaaaa43/nothings/refs/heads/main/tampilan.lua", true))()
 
--- Auto Fish
-window:AddToggle("Auto Fish", function(state)
-    getfenv().fish = (state and true or false)
-    while getfenv().fish do
-        task.wait()
+local hookmetamethod: (Object: Object, Metamethod: string, NewFunction: (Object?, any) -> (any)) -> ((any) -> (any)) = getfenv().hookmetamethod
+local getnamecallmethod: () -> (string) = getfenv().getnamecallmethod
+local checkcaller: () -> (boolean) = getfenv().checkcaller
+
+local ApplyUnsupportedName: (Name: string, Condition: boolean) -> (string) = getgenv().ApplyUnsupportedName
+local HandleConnection: (Connection: RBXScriptConnection, Name: string) -> () = getgenv().HandleConnection
+local Notify: (Title: string, Content: string, Image: string) -> () = getgenv().Notify
+local GetClosestChild: (Children: {PVInstance}, Callback: (Child: PVInstance) -> boolean) -> (PVInstance?) = getgenv().GetClosestChild
+
+type Tab = {
+	CreateSection: (self: Tab, Name: string) -> any,
+	CreateDivider: (self: Tab) -> any,
+	[any]: any
+}
+
+type Inventory = {
+	[string]: {
+		ModelName: string,
+		Quantity: number,
+		Name: string,
+		OriginalOwner: number,
+		Attributes: {},
+		CreationTime: number,
+		OwnerHistory: {},
+		HotbarSlot: number
+	}
+}
+
+local Flags: {[string]: {["CurrentValue"]: any, ["CurrentOption"]: {string}}} = getgenv().Flags
+
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local MarketplaceService = game:GetService("MarketplaceService")
+local Players = game:GetService("Players")
+
+local Player = Players.LocalPlayer
+
+local Network = ReplicatedStorage:WaitForChild("Source"):WaitForChild("Network")
+local RemoteFunctions: Folder & {[string]: RemoteFunction} = Network:WaitForChild("RemoteFunctions")
+local RemoteEvents: Folder & {[string]: RemoteEvent} = Network:WaitForChild("RemoteEvents")
+
+local Window = getgenv().Window
+
+if not Window then
+	return
+end
+
+local Tab: Tab = Window:CreateTab("Fishing", "sell")
+
+Tab:CreateSection("Fishing")
+
+local function ReEquipTool(Tool: Tool)
+	if not Tool or not Tool.Parent then
+		return
+	end
+    
         local chr = game.Players.LocalPlayer.Character
         if not chr:FindFirstChildOfClass("Tool") or chr:FindFirstChildOfClass("Tool"):GetAttribute("type") ~= "Rods" then
             local plr = game.Players.LocalPlayer.UserId
@@ -58,8 +104,23 @@ window:AddToggle("Auto Fish", function(state)
     end
 end)
 
+Tab:CreateToggle({
+Name = "⚡ • Auto Fast Sell)",
+	CurrentValue = false,
+	Flag = "Dig"
+function toggleAutoSellLoot(state)
+    _G.autoSellLoot = state
+    while _G.autoSellLoot do
+        game:GetService("ReplicatedStorage").CloudFrameShared.DataStreams.processGameItemSold:InvokeServer("SellEverything")
+        task.wait(1)
+    end
+end
+})
 -- **No Cooldown Spear Toggle**
-_G.noCooldownSpear = false
+Tab:CreateToggle({
+	Name = "⛏️ • No coldown spear/axe)",
+	CurrentValue = false,
+	Flag = "nocoldown",
 
 function toggleNoCooldownSpear(state)
     _G.noCooldownSpear = state
@@ -181,15 +242,6 @@ function toggleAutoLockKeys(state)
     end)
 end
 
--- **Auto Sell Loot**
-_G.autoSellLoot = false
-function toggleAutoSellLoot(state)
-    _G.autoSellLoot = state
-    while _G.autoSellLoot do
-        game:GetService("ReplicatedStorage").CloudFrameShared.DataStreams.processGameItemSold:InvokeServer("SellEverything")
-        task.wait(1)
-    end
-end
 
 -- autoOpenChest
 _G.autoOpenChest = false
